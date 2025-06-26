@@ -39,6 +39,7 @@ poetry run flake8
 poetry run black --check .
 poetry run mypy src/
 ```
+
 ##Документация и ссылки
 
 ##Лицензия
