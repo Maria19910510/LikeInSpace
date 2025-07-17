@@ -9,8 +9,9 @@ def test_get_mask_card_number_1():
 
 
 def test_get_mask_card_number_2():
+    # Проверка на менее 10 символов
     with pytest.raises(ValueError):
-        get_mask_card_number("123456789")  # менее 10 символов
+        get_mask_card_number("123456789")
 
 
 def test_get_mask_card_number_3():
@@ -26,5 +27,6 @@ def test_get_mask_account_1():
 
 
 def test_get_mask_account_2():
+    # Проверка на менее 4 символов
     with pytest.raises(ValueError):
-        get_mask_account("123")  # менее 4 символов
+        get_mask_account("123")
