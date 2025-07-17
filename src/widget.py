@@ -18,7 +18,3 @@ def get_date(date_str: str) -> str:
     date_list[2] = date_list[2][:2]
     date_list_reverse = ".".join(date_list[::-1])
     return date_list_reverse
-
-
-print(mask_account_card("Visa Classic 1234567890123456"))
-print(get_date("2023-10-23"))
