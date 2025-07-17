@@ -1,6 +1,5 @@
 def get_mask_card_number(card_number: str) -> str:
     """Функция, которая маскирует номер карты"""
-    card_number = card_number.replace(" ", "")
     if len(card_number) < 16:
         raise ValueError("Номер карты слишком короткий")
     masked = f"{card_number[:4]} {card_number[4:6]}** **** {card_number[-4:]}"
