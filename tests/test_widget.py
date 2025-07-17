@@ -1,9 +1,9 @@
-from src.widget import mask_account_card
+from src.widget import get_date, mask_account_card
 import pytest
 
 
 @pytest.fixture(autouse=True)
-def patch_get_mask_card_number(monkeypatch):
+def test_patch_get_mask_card_number(monkeypatch):
     monkeypatch.setattr('src.masks.get_mask_card_number', mock_get_mask_card_number)
 
 def test_mask_account_card_with_schet():

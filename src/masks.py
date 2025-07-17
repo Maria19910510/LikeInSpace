@@ -11,3 +11,7 @@ def get_mask_account(account_number: str) -> str:
         raise ValueError("Номер счета слишком короткий")
     masked = "**" + account_number[-4:]
     return masked
+
+
+print(get_mask_card_number("1234567891234567"))
+print(get_mask_account("123456789"))
