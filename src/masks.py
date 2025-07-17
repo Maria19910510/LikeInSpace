@@ -5,6 +5,7 @@ def get_mask_card_number(card_number: str) -> str:
     masked = f"{card_number[:4]} {card_number[4:6]}** **** {card_number[-4:]}"
     return masked
 
+
 def get_mask_account(account_number: str) -> str:
     """Функция, которая маскирует номер счета"""
     if len(account_number) < 4:
