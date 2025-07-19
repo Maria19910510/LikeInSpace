@@ -15,7 +15,7 @@ def test_get_mask_card_number_2():
         get_mask_card_number("123456789")
 
 
-def test_get_mask_card_number_3() -> None:
+def test_get_mask_card_number_3():
     card_number = "9876543210987654"
     masked = get_mask_card_number(card_number)
     assert masked == "9876 54** **** 7654"

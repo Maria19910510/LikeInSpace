@@ -1,13 +1,13 @@
 from src.widget import get_date, mask_account_card
 
 
-def test_mask_account_card_with_schet() -> None:
+def test_mask_account_card_with_schet():
     # тест для счета
     result = mask_account_card("Счет 408178105123456789")
     assert result == "Счет **6789"
 
 
-def test_mask_account_card_with_card() -> None:
+def test_mask_account_card_with_card():
     # тест для номера карты
     card_info = "Мастеркард Gold 1234567890123456"
     result = mask_account_card(card_info)
@@ -17,7 +17,7 @@ def test_mask_account_card_with_card() -> None:
     assert result.endswith("3456")
 
 
-def test_mask_account_card_without_spaces() -> None:
+def test_mask_account_card_without_spaces():
     # тест для строки без лишних пробелов
     card_info = "Виза  9876543210987654"
     result = mask_account_card(card_info)
@@ -25,14 +25,14 @@ def test_mask_account_card_without_spaces() -> None:
     assert result.endswith("7654")
 
 
-def test_get_date() -> None:
+def test_get_date():
     # тест для преобразования даты
     date_str = "2023-10-05"
     result = get_date(date_str)
     assert result == "05.10.2023"
 
 
-def test_get_date_with_short_year() -> None:
+def test_get_date_with_short_year():
     # тест, когда год трехзначный (например, 2023-10-05)
     date_str = "2023-12-01"
     result = get_date(date_str)
