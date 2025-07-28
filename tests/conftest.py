@@ -45,3 +45,33 @@ def sample_transactions_with_type():
             "type": "transfer_card",
         },
     ]
+
+
+@pytest.fixture
+def sample_transactions():
+    return [
+        {
+            "type": "transfer_org",
+            "operationAmount": {"currency": {"code": "USD"}},
+        },
+        {
+            "type": "transfer_account",
+            "operationAmount": {"currency": {"code": "EUR"}},
+        },
+        {
+            "type": "transfer_card",
+            "operationAmount": {"currency": {"code": "USD"}},
+        },
+        {
+            "type": "transfer_person",
+            "operationAmount": {"currency": {"code": "RUB"}},
+        },
+        {
+            "type": "unknown_type",
+            "operationAmount": {"currency": {"code": "USD"}},
+        },
+        {
+            "type": "transfer_org",
+            "operationAmount": {"currency": {"code": "JPY"}},
+        },
+    ]
