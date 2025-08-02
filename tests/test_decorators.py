@@ -1,11 +1,15 @@
 import pytest
+
 from src.decorators import log
+
 
 def successful_func(x):
     return x + 10
 
+
 def error_func():
     raise RuntimeError("Некорректное выполнение функции")
+
 
 # Тест для логирования в консоль при успешном вызове
 def test_log_console_success(capsys):
@@ -17,6 +21,7 @@ def test_log_console_success(capsys):
     assert "successful_func started." in captured.out
     # Проверка, что сообщение о завершении успеха есть в выводе
     assert "successful_func ok" in captured.out
+
 
 # Тест для логирования в консоль при возникновении исключения
 def test_log_console_error(capsys):
@@ -30,6 +35,7 @@ def test_log_console_error(capsys):
     assert "RuntimeError" in captured.out
     assert "Traceback (most recent call last):" in captured.out
 
+
 # Тест для логирования в файл при успешном вызове
 def test_log_file_success(tmp_path):
     log_file = tmp_path / "logfile.txt"
@@ -39,6 +45,7 @@ def test_log_file_success(tmp_path):
     log_contents = log_file.read_text()
     assert "successful_func started." in log_contents
     assert "successful_func ok" in log_contents
+
 
 # Тест для логирования в файл при ошибке
 def test_log_file_error(tmp_path):
@@ -50,6 +57,7 @@ def test_log_file_error(tmp_path):
     assert "error_func started." in log_contents
     assert "error_func error:" in log_contents
     assert "RuntimeError" in log_contents
+
 
 # Дополнительный тест: несколько вызовов с разными результатами
 def test_multiple_calls_with_mixed_results(tmp_path):
