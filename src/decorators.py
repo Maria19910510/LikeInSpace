@@ -5,6 +5,8 @@ from typing import Any, Callable, Dict, Optional, Tuple
 
 
 def log(filename: Optional[str] = None) -> Callable:
+    """ Декоратор для логирования функции, записывает файл или выводит в консоль информацию
+    о начале, результате или ошибки функции"""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
