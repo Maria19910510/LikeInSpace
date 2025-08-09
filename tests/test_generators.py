@@ -5,7 +5,7 @@ def test_filter_by_currency_matches():
     transactions = [
         {"operationAmount": {"currency": {"code": "USD"}}},
         {"operationAmount": {"currency": {"code": "RUB"}}},
-        {"operationAmount": {"currency": {"code": "USD"}}}
+        {"operationAmount": {"currency": {"code": "USD"}}},
     ]
     result = list(filter_by_currency(transactions, "USD"))
     assert len(result) == 2
@@ -16,7 +16,7 @@ def test_filter_by_currency_matches():
 def test_filter_by_currency_no_matches():
     transactions = [
         {"operationAmount": {"currency": {"code": "EUR"}}},
-        {"operationAmount": {"currency": {"code": "JPY"}}}
+        {"operationAmount": {"currency": {"code": "JPY"}}},
     ]
     assert list(filter_by_currency(transactions, "USD")) == []
 
@@ -52,11 +52,7 @@ def test_transaction_descriptions_missing_type():
 def test_card_number_generator_format():
     gen = card_number_generator(0, 2)
     output = list(gen)
-    assert output == [
-        "0000 0000 0000 0000",
-        "0000 0000 0000 0001",
-        "0000 0000 0000 0002"
-    ]
+    assert output == ["0000 0000 0000 0000", "0000 0000 0000 0001", "0000 0000 0000 0002"]
 
 
 def test_card_number_generator_range():
@@ -66,7 +62,7 @@ def test_card_number_generator_range():
     numbers = list(gen)
     for i, num_str in enumerate(numbers, start=start):
         expected_num_str = f"{i:016d}"
-        expected_formatted = " ".join([expected_num_str[j:j + 4] for j in range(0, 16, 4)])
+        expected_formatted = " ".join([expected_num_str[j : j + 4] for j in range(0, 16, 4)])
         assert num_str == expected_formatted
 
 
