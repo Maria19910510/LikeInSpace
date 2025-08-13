@@ -1,5 +1,6 @@
 import os
 from typing import Union
+
 import requests
 
 API_URL = "https://api.apilayer.com/exchangerates_data/latest"
