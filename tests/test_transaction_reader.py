@@ -1,6 +1,9 @@
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import MagicMock, mock_open, patch
+
 import pandas as pd
+
 from src.transaction_reader import read_transactions_from_csv, read_transactions_from_xlsx
+
 
 # Тесты для функции read_transactions_from_csv
 @patch("builtins.open", new_callable=mock_open, read_data="date,amount,description\n2023-01-01,100,Sample Transaction")

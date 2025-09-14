@@ -1,9 +1,6 @@
 import pytest
 from src.masks import get_mask_account, get_mask_card_number
 
-# Импортируем setup_module_logger, чтобы в тестах его можно было замокать
-from src.logger_config import setup_module_logger
-
 
 @pytest.fixture(autouse=True)
 def disable_logging(monkeypatch):
@@ -49,8 +46,6 @@ def test_get_mask_account_2():
         ("1111222233334444", "1111 22** **** 4444"),
     ],
 )
-
-
 def test_get_mask_card_number_param(card_number, expected_masked):
     assert get_mask_card_number(card_number) == expected_masked
 
@@ -63,7 +58,5 @@ def test_get_mask_card_number_param(card_number, expected_masked):
         ("00000001", "**0001"),
     ],
 )
-
-
 def test_get_mask_account_param(account_number, expected_masked):
     assert get_mask_account(account_number) == expected_masked
