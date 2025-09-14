@@ -1,7 +1,7 @@
 import json
 from typing import Any, Dict, List
 
-from logger_config import setup_module_logger
+from src.logger_config import setup_module_logger
 
 logger = setup_module_logger(__name__)
 
