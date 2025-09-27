@@ -12,12 +12,11 @@ def main():
     choice = input()
     print(f"Вы выбрали пункт {choice}")
 
-
     # Обработка выбора файла и его загрузки
-    if choice == '1':
+    if choice == "1":
         filename = input("Введите название JSON-файла: ")
         data = load_json(filename)
-    elif choice == '2':
+    elif choice == "2":
         filename = input("Введите название CSV-файла: ")
         data = load_csv(filename)
     else:
@@ -25,42 +24,47 @@ def main():
         return
 
     # Фильтрация по статусу
-    statuses = ['EXECUTED', 'CANCELED', 'PENDING']
+    statuses = ["EXECUTED", "CANCELED", "PENDING"]
     while True:
         status_input = input(
             "Введите статус, по которому необходимо выполнить фильтрацию:\n"
-            "Доступные для фильтрации статусы: EXECUTED, CANCELED, PENDING\n").strip()
+            "Доступные для фильтрации статусы: EXECUTED, CANCELED, PENDING\n"
+        ).strip()
         status_upper = status_input.upper()
         if status_upper in statuses:
-            print(f"Операции отфильтрованы по статусу \"{status_upper}\"")
+            print(f'Операции отфильтрованы по статусу "{status_upper}"')
             break
         else:
-            print(f"Статус операции \"{status_input}\" недоступен.")
+            print(f'Статус операции "{status_input}" недоступен.')
 
     # Фильтрация данных по выбранному статусу
-    filtered_data = [t for t in data if t.get('status', '').upper() == status_upper]
+    filtered_data = [t for t in data if t.get("status", "").upper() == status_upper]
 
     # сортировка по дате
     sort_choice = input("Отсортировать по дате? (да/нет): ").strip().lower()
-    if sort_choice == 'да':
+    if sort_choice == "да":
         # Предполагается, что даты в формате 'YYYY-MM-DD' или подобном
         def parse_date(t):
             from datetime import datetime
-            date_str = t.get('date', '')
+
+            date_str = t.get("date", "")
             try:
-                return datetime.strptime(date_str, '%Y-%m-%d')
+                return datetime.strptime(date_str, "%Y-%m-%d")
             except:
                 return datetime.min  # Если дата отсутствует или неверного формата
+
         filtered_data.sort(key=parse_date)
 
     # Фильтрация по валюте
     currency_filter = input("Введите валюту для фильтрации (оставьте пустым, чтобы пропустить): ").strip()
     if currency_filter:
-        filtered_data = [t for t in filtered_data if t.get('currency', '').upper() == currency_filter.upper()]
+        filtered_data = [t for t in filtered_data if t.get("currency", "").upper() == currency_filter.upper()]
 
     # Фильтрация по слову в описании
-    filter_word = input("Отфильтровать список транзакций по определенному слову в описании? (да/нет): ").strip().lower()
-    if filter_word == 'да':
+    filter_word = (
+        input("Отфильтровать список транзакций по определенному слову в описании? (да/нет): ").strip().lower()
+    )
+    if filter_word == "да":
         word = input("Введите слово: ").strip()
         filtered_data = process_bank_search(filtered_data, word)
 
@@ -80,18 +84,20 @@ def main():
 # Объявление вспомогательных функций для загрузки данных
 def load_json(filename):
     import json
-    with open(filename, 'r', encoding='utf-8') as f:
+
+    with open(filename, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def load_csv(filename):
     import csv
-    with open(filename, 'r', encoding='utf-8', newline='') as f:
+
+    with open(filename, "r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         return list(reader)
 
 
 def process_bank_search(transactions, keyword):
-    """ Фильтрует список транзакций по вхождению ключевого слова в описание"""
+    """Фильтрует список транзакций по вхождению ключевого слова в описание"""
     keyword_upper = keyword.upper()
-    return [t for t in transactions if keyword_upper in t.get('description', '').upper()]
+    return [t for t in transactions if keyword_upper in t.get("description", "").upper()]
