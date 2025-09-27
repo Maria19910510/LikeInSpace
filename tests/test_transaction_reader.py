@@ -22,16 +22,14 @@ def test_read_transactions_from_csv(mock_csv_reader, mock_open_):
     assert result[0]["date"] == "2023-01-01"
     assert result[0]["amount"] == "100"
     assert result[0]["description"] == "Sample Transaction"
-    mock_open_.assert_called_once_with("dummy_path.csv", newline='', encoding='utf-8')
+    mock_open_.assert_called_once_with("dummy_path.csv", newline="", encoding="utf-8")
     mock_csv_reader.assert_called_once()
 
 
 # Тест для функции чтения из Excel
 @patch("pandas.read_excel")
 def test_read_transactions_from_xlsx(mock_read_excel):
-    mock_df = pd.DataFrame([
-        {"date": "2023-01-01", "amount": 200, "description": "Excel Transaction"}
-    ])
+    mock_df = pd.DataFrame([{"date": "2023-01-01", "amount": 200, "description": "Excel Transaction"}])
     mock_read_excel.return_value = mock_df
 
     result = read_transactions_from_xlsx("dummy_path.xlsx")

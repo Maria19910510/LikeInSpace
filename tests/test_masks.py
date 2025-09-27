@@ -1,11 +1,12 @@
 import pytest
+
 from src.masks import get_mask_account, get_mask_card_number
 
 
 @pytest.fixture(autouse=True)
 def disable_logging(monkeypatch):
     # Заменяем setup_module_logger, чтобы он ничего не делал
-    monkeypatch.setattr('src.logger_config.setup_module_logger', lambda module_name: None)
+    monkeypatch.setattr("src.logger_config.setup_module_logger", lambda module_name: None)
 
 
 def test_get_mask_card_number_1():
