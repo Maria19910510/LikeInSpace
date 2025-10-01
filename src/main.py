@@ -6,6 +6,7 @@ import pandas as pd
 
 
 def read_transactions_from_csv(file_path: str) -> List[Dict[str, str]]:
+    """Читает транзакции из CSV-файла и возвращает список словарей"""
     transactions: List[Dict[str, str]] = []
     with open(file_path, newline="", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
@@ -15,28 +16,33 @@ def read_transactions_from_csv(file_path: str) -> List[Dict[str, str]]:
 
 
 def read_transactions_from_xlsx(file_path: str) -> List[Dict[str, str]]:
+    """Читает транзакции из XLSX-файла с помощью pandas и возвращает список словарей"""
     df = pd.read_excel(file_path)
     transactions: List[Dict[str, str]] = df.to_dict(orient="records")
     return transactions
 
 
 def get_transactions_from_json(file_path: str) -> List[Dict[str, str]]:
+    """ Загружает транзакции из JSON-файла"""
     with open(file_path, "r", encoding="utf-8") as f:
         transactions = json.load(f)
     return transactions
 
 
 def filter_by_status(transactions: List[Dict], status: str) -> List[Dict]:
+    """Фильтрует список транзакций по статусу"""
     filtered = [tx for tx in transactions if tx.get("status", "").strip().upper() == status.upper()]
     return filtered
 
 
 def sort_transactions(transactions: List[Dict], ascending: bool = True) -> List[Dict]:
+    """Сортирует транзакции по дате"""
     # Предположим, что у транзакций есть дата в поле 'date'
     # Для надежности преобразуем в дату, если нужно
     from datetime import datetime
 
     def parse_date(tx: Dict) -> datetime:
+
         date_str = tx.get("date", "")
         try:
             return datetime.strptime(date_str, "%d.%m.%Y")
@@ -46,7 +52,8 @@ def sort_transactions(transactions: List[Dict], ascending: bool = True) -> List[
     return sorted(transactions, key=parse_date, reverse=not ascending)
 
 
-def filter_by_amount_currency(transactions: List[Dict], currency: str, amount_only: bool = False) -> List[Dict]:
+def filter_by_amount_currency(transactions: List[Dict], currency: str) -> List[Dict]:
+    """Фильтрует транзакции по указанной валюте"""
     # Можно фильтровать по 'currency' и, если нужно, по количеству
     def matches(tx: Dict) -> bool:
         sum_str = tx.get("amount", "")
@@ -57,11 +64,13 @@ def filter_by_amount_currency(transactions: List[Dict], currency: str, amount_on
 
 
 def filter_by_keyword(transactions: List[Dict], keyword: str) -> List[Dict]:
+    """Фильтрует транзакции по наличию ключевого слова в поле 'description'"""
     keyword_lower = keyword.lower()
     return [tx for tx in transactions if keyword_lower in tx.get("description", "").lower()]
 
 
 def print_transactions(transactions: List[Dict]) -> None:
+    """Выводит список транзакций в удобочитаемом формате"""
     if not transactions:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
         return
@@ -75,6 +84,10 @@ def print_transactions(transactions: List[Dict]) -> None:
 
 
 def main() -> None:
+    """Основная функция программы, реализующая взаимодействие с пользователем.
+    Позволяет выбрать источник данных (JSON, CSV или XLSX файл), загружает транзакции,
+    затем предлагает выполнить фильтрацию по статусу, сортировку и дополнительные фильтры,
+    после чего отображает итоговый список транзакций"""
     print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
     print("Выберите необходимый пункт меню:")
     print("1. Получить информацию о транзакциях из JSON-файла")
@@ -133,7 +146,7 @@ def main() -> None:
     # Фильтр по валюте
     currency_filter = input("Выводить только рублевые транзакции? Да/Нет\n").strip().lower()
     if currency_filter in ["да", "д", "yes", "y", "true"]:
-        filtered_transactions = filter_by_amount_currency(filtered_transactions, "руб", amount_only=True)
+        filtered_transactions = filter_by_amount_currency(filtered_transactions, "руб")
 
     # Фильтр по слову в описании
     description_filter = (
