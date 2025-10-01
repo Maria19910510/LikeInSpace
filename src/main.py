@@ -1,103 +1,147 @@
-def main():
-    """Основная функция программы для работы с банковскими транзакциями.
-    Обеспечивает выбор файла, загрузку данных, фильтрацию по статусу,
-    дальнейшую фильтрацию по дате и валюте, а также по слову в описании.
-    Затем выводит итоговые транзакции"""
-    print("Программа: Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
+import csv
+import json
+from typing import Dict, List
+
+import pandas as pd
+
+
+def read_transactions_from_csv(file_path: str) -> List[Dict[str, str]]:
+    transactions: List[Dict[str, str]] = []
+    with open(file_path, newline="", encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            transactions.append(row)
+    return transactions
+
+
+def read_transactions_from_xlsx(file_path: str) -> List[Dict[str, str]]:
+    df = pd.read_excel(file_path)
+    transactions: List[Dict[str, str]] = df.to_dict(orient="records")
+    return transactions
+
+
+def get_transactions_from_json(file_path: str) -> List[Dict[str, str]]:
+    with open(file_path, "r", encoding="utf-8") as f:
+        transactions = json.load(f)
+    return transactions
+
+
+def filter_by_status(transactions: List[Dict], status: str) -> List[Dict]:
+    filtered = [tx for tx in transactions if tx.get("status", "").strip().upper() == status.upper()]
+    return filtered
+
+
+def sort_transactions(transactions: List[Dict], ascending: bool = True) -> List[Dict]:
+    # Предположим, что у транзакций есть дата в поле 'date'
+    # Для надежности преобразуем в дату, если нужно
+    from datetime import datetime
+
+    def parse_date(tx: Dict) -> datetime:
+        date_str = tx.get("date", "")
+        try:
+            return datetime.strptime(date_str, "%d.%m.%Y")
+        except Exception:
+            return datetime.min  # чтобы транзакции с ошибками в дате шли в начало
+
+    return sorted(transactions, key=parse_date, reverse=not ascending)
+
+
+def filter_by_amount_currency(transactions: List[Dict], currency: str, amount_only: bool = False) -> List[Dict]:
+    # Можно фильтровать по 'currency' и, если нужно, по количеству
+    def matches(tx: Dict) -> bool:
+        sum_str = tx.get("amount", "")
+        # допустим, сумма указана так: '40542 руб.' или '130 USD'
+        return currency.lower() in sum_str.lower()
+
+    return [tx for tx in transactions if matches(tx)]
+
+
+def filter_by_keyword(transactions: List[Dict], keyword: str) -> List[Dict]:
+    keyword_lower = keyword.lower()
+    return [tx for tx in transactions if keyword_lower in tx.get("description", "").lower()]
+
+
+def print_transactions(transactions: List[Dict]) -> None:
+    if not transactions:
+        print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
+        return
+    print(f"Всего банковских операций в выборке: {len(transactions)}\n")
+    for tx in transactions:
+        date = tx.get("date", "---")
+        description = tx.get("description", "")
+        amount = tx.get("amount", "")
+        print(f"{date} {description}")
+        print(f"Сумма: {amount}\n")
+
+
+def main() -> None:
+    print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
     print("Выберите необходимый пункт меню:")
     print("1. Получить информацию о транзакциях из JSON-файла")
     print("2. Получить информацию о транзакциях из CSV-файла")
     print("3. Получить информацию о транзакциях из XLSX-файла")
 
-    choice = input()
-    print(f"Вы выбрали пункт {choice}")
-
-    # Обработка выбора файла и его загрузки
+    choice = input().strip()
     if choice == "1":
-        filename = input("Введите название JSON-файла: ")
-        data = load_json(filename)
+        print("Для обработки выбран JSON-файл.")
+        file_path = input("Введите путь к JSON-файлу: ").strip()
+        transactions: List[Dict] = get_transactions_from_json(file_path)
     elif choice == "2":
-        filename = input("Введите название CSV-файла: ")
-        data = load_csv(filename)
+        print("Для обработки выбран CSV-файл.")
+        file_path = input("Введите путь к CSV-файлу: ").strip()
+        transactions = read_transactions_from_csv(file_path)
+    elif choice == "3":
+        print("Для обработки выбран XLSX-файл.")
+        file_path = input("Введите путь к XLSX-файлу: ").strip()
+        transactions = read_transactions_from_xlsx(file_path)
     else:
-        print("Некорректный выбор.")
+        print("Некорректный выбор. Завершение программы.")
         return
 
-    # Фильтрация по статусу
-    statuses = ["EXECUTED", "CANCELED", "PENDING"]
+    # Получение фильтра по статусу
+    valid_statuses = ["EXECUTED", "CANCELED", "PENDING"]
     while True:
         status_input = input(
-            "Введите статус, по которому необходимо выполнить фильтрацию:\n"
-            "Доступные для фильтрации статусы: EXECUTED, CANCELED, PENDING\n"
+            "Введите статус, по которому необходимо выполнить фильтрацию."
+            "Доступные для фильтрации статусы: EXECUTED, CANCELED, PENDING"
         ).strip()
         status_upper = status_input.upper()
-        if status_upper in statuses:
+        if status_upper in valid_statuses:
             print(f'Операции отфильтрованы по статусу "{status_upper}"')
             break
         else:
             print(f'Статус операции "{status_input}" недоступен.')
 
-    # Фильтрация данных по выбранному статусу
-    filtered_data = [t for t in data if t.get("status", "").upper() == status_upper]
+    filtered_transactions = filter_by_status(transactions, status_upper)
 
-    # сортировка по дате
-    sort_choice = input("Отсортировать по дате? (да/нет): ").strip().lower()
-    if sort_choice == "да":
-        # Предполагается, что даты в формате 'YYYY-MM-DD' или подобном
-        def parse_date(t):
-            from datetime import datetime
-
-            date_str = t.get("date", "")
-            try:
-                return datetime.strptime(date_str, "%Y-%m-%d")
-            except:
-                return datetime.min  # Если дата отсутствует или неверного формата
-
-        filtered_data.sort(key=parse_date)
-
-    # Фильтрация по валюте
-    currency_filter = input("Введите валюту для фильтрации (оставьте пустым, чтобы пропустить): ").strip()
-    if currency_filter:
-        filtered_data = [t for t in filtered_data if t.get("currency", "").upper() == currency_filter.upper()]
-
-    # Фильтрация по слову в описании
-    filter_word = (
-        input("Отфильтровать список транзакций по определенному слову в описании? (да/нет): ").strip().lower()
-    )
-    if filter_word == "да":
-        word = input("Введите слово: ").strip()
-        filtered_data = process_bank_search(filtered_data, word)
-
-    # Итоговая проверка
-    if not filtered_data:
-        print("Программа: Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
+    if not filtered_transactions:
+        print("Нет операций, соответствующих выбранному статусу.")
         return
 
-    # Вывод итоговых транзакций
+    # Сортировка
+    sort_choice = input("Отсортировать операции по дате? Да/Нет\n").strip().lower()
+    if sort_choice in ["да", "д", "yes", "y", "true"]:
+        order = input("Отсортировать по возрастанию или по убыванию?\n").strip().lower()
+        ascending = True
+        if order in ["по возрастанию", "возрастанию", "по убыванию", "убыванию", "asc", "descending", "desc"]:
+            if "убыван" in order:
+                ascending = False
+            else:
+                ascending = True
+        filtered_transactions = sort_transactions(filtered_transactions, ascending=ascending)
+
+    # Фильтр по валюте
+    currency_filter = input("Выводить только рублевые транзакции? Да/Нет\n").strip().lower()
+    if currency_filter in ["да", "д", "yes", "y", "true"]:
+        filtered_transactions = filter_by_amount_currency(filtered_transactions, "руб", amount_only=True)
+
+    # Фильтр по слову в описании
+    description_filter = (
+        input("Отфильтровать список транзакций по определенному слову в описании? Да/Нет\n").strip().lower()
+    )
+    if description_filter in ["да", "д", "yes", "y", "true"]:
+        keyword = input("Введите слово для поиска в описании: ").strip()
+        filtered_transactions = filter_by_keyword(filtered_transactions, keyword)
+
     print("Распечатываю итоговый список транзакций...")
-    print(f"Всего банковских операций в выборке: {len(filtered_data)}")
-    for t in filtered_data:
-        print(f"{t.get('date', '')} {t.get('description', '')}")
-        print(f"Сумма: {t.get('amount', '')} {t.get('currency', '')}\n")
-
-
-# Объявление вспомогательных функций для загрузки данных
-def load_json(filename):
-    import json
-
-    with open(filename, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def load_csv(filename):
-    import csv
-
-    with open(filename, "r", encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        return list(reader)
-
-
-def process_bank_search(transactions, keyword):
-    """Фильтрует список транзакций по вхождению ключевого слова в описание"""
-    keyword_upper = keyword.upper()
-    return [t for t in transactions if keyword_upper in t.get("description", "").upper()]
+    print_transactions(filtered_transactions)
