@@ -8,9 +8,9 @@ logger = setup_module_logger(__name__)
 
 def load_transactions(file_path: str) -> List[Dict[str, Any]]:
     """Загружает список транзакций из JSON-файла.
-        Возвращает пустой список, если файл отсутствует, пустой, не список или содержит некорректные данные"""
+    Возвращает пустой список, если файл отсутствует, пустой, не список или содержит некорректные данные"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         if isinstance(data, list):
             logger.info(f"Загружено {len(data)} транзакций из {file_path}")
